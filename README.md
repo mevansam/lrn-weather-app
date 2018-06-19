@@ -18,9 +18,9 @@ When preparing the initial project source the following command was run to ensur
 react-native link
 ```
 
-However, this did not automatically add the Camararoll native module as it is part of the base react-native application modules. So the Cameraroll IOS module found at `<LRN_Weather_App HOME>/node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj` was linked manually using the instructions provided on the [Linking Libraries](https://facebook.github.io/react-native/docs/linking-libraries-ios.html) page of the official documentation.
+However, this did not automatically add the Camararoll native module as it was already part of the base react-native application modules. So the Cameraroll IOS module found at `<LRN_Weather_App HOME>/node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj` was linked manually using the instructions provided on the [Linking Libraries](https://facebook.github.io/react-native/docs/linking-libraries-ios.html) page of the official documentation.
 
-For IOS projects non-TLS XHR requests will be rejected. To enable this you need to set the key `NSAllowsArbitraryLoads` to `true` in the XCode project's Info.plist file.
+In order to enable XHR calls to the non-TLS weather API service the key `NSAllowsArbitraryLoads` was set to `true` in the XCode project's Info.plist file.
 
 ```
   .
@@ -33,7 +33,7 @@ For IOS projects non-TLS XHR requests will be rejected. To enable this you need 
     .
 ```
 
-For IOS the following key was also added to show a descriptive message when allowing access to the CamaraRoll and Location services.
+The following keys were also added to show a descriptive messages when allowing access to the CamaraRoll and Location services.
 
 ```
 .
