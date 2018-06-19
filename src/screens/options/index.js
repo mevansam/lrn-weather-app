@@ -21,19 +21,27 @@ export default class Options extends Component<Props> {
     super(props);
 
     this.store = this.props.store;
-
     this.reloadCatalog = false;
 
     this.state = {
+      photoCatalogType: 0,
+      unitType: 0
+    }
+  }
+
+  async componentDidMount() {
+
+    await this.store.init()
+
+    this.setState({
       photoCatalogType: this.store.getItem("PhotoCatalogType") || 0,
       unitType: this.store.getItem("UnitType") || 0
-    }
+    });
   }
 
   updatePhotoCatalog(updateFunc) {
 
     backdropImage = this.store.getItem("MainBackdrop")
-    console.log("backdropImage: ", backdropImage)
     if (backdropImage) {
       backdropImageUri = backdropImage.uri
     }
@@ -45,8 +53,11 @@ export default class Options extends Component<Props> {
       }).then(data => {
 
         var photos = data.edges.map(edge => {
-          imageUri = edge.node.image.uri
-          return { uri: imageUri, selected: (backdropImage && imageUri == backdropImageUri) };
+          imageUri = edge.node.image.uri;
+          return {
+            uri: imageUri,
+            selected: (backdropImage && imageUri == backdropImageUri)
+          };
         })
 
         updateFunc(photos);
@@ -55,7 +66,18 @@ export default class Options extends Component<Props> {
       });
 
     } else {
-      updateFunc(webPhotos);
+
+      var photos = webPhotos.map(photo => {
+        imageUri = photo.uri
+        return {
+          uri: imageUri,
+          selected: (backdropImage && imageUri == backdropImageUri),
+          title: photo.title,
+          subtitle: photo.subtitle
+        };
+      })
+
+      updateFunc(photos);
     }
   }
 
@@ -65,10 +87,12 @@ export default class Options extends Component<Props> {
 
   _setPhotoCatalogType = (selectedIndex) => {
     this.reloadCatalog = true
+    this.store.setItem("PhotoCatalogType", selectedIndex)
     this.setState({ photoCatalogType: selectedIndex });
   }
 
   _setUnitType = (selectedIndex) => {
+    this.store.setItem("UnitType", selectedIndex)
     this.setState({ unitType: selectedIndex });
   }
 

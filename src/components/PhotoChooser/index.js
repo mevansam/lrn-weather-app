@@ -41,6 +41,12 @@ export default class PhotoChooser extends Component<Props> {
       this.dataCallback(data => {
         this.findSelectedIndex(data);
         this.setState({ data: data });
+
+        // Second update of component will scroll
+        // the carousal to the selected slide.
+        setTimeout(() => {
+          this.setState({})
+        }, 500);
       });
 
     } else {
@@ -78,7 +84,6 @@ export default class PhotoChooser extends Component<Props> {
       <SliderEntry
         data={item}
         index={index}
-        even={(index + 1) % 2 === 0}
         parallax={true}
         parallaxProps={parallaxProps}
         style={this.props.style}

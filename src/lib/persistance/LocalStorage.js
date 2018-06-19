@@ -34,27 +34,37 @@ class MemoryStorage {
     this.id = id;
     this.initialized = false;
     this.obj = {};
+
+    this.notificationCallbacks = {}
+
+    this.initPromise = null;
   }
 
   /**
    * Synchronizes this MemoryStorage with React Native's AsyncStorage
    */
   async init() {
-    await new Promise((resolve, reject) => {
-      AsyncStorage.getItem(this.id, (e, r) => {
 
-        if (e) {
-          reject(e);
-        } else {
-          this.obj = r ? JSON.parse(r) : this.obj;
+    if (this.initPromise == null) {
 
-          console.log("Initialized store '" + this.id + "': ", this.obj);
+      this.initPromise = new Promise((resolve, reject) => {
+        AsyncStorage.getItem(this.id, (e, r) => {
 
-          this.initialized = true;
-          resolve(this.obj);
-        }
+          if (e) {
+            reject(e);
+          } else {
+            this.obj = r ? JSON.parse(r) : this.obj;
+
+            console.log("Initialized store '" + this.id + "': ", this.obj);
+
+            this.initialized = true;
+            resolve(this.obj);
+          }
+        });
       });
-    });
+    }
+
+    await this.initPromise
   }
 
   /**
@@ -74,8 +84,31 @@ class MemoryStorage {
    *                              where will be one of 0 (ADDED), 1 (DELETED), or 
    *                              2 (CHANGED).
    */
-  registerChangeListener(key, callback) {
+  registerNotificationHandler(key, callback) {
+    callbackList = this.notificationCallbacks[key];
+    if (!callbackList) {
+      callbackList = [];
+    }
+    callbackList.push(callback);
+    this.notificationCallbacks[key] = callbackList;
+  }
 
+  /**
+   * @param {string} key 
+   * @param {string} value 
+   * @param {number} action 
+   */
+  async _sendNotifications(key, value, action) {
+
+    wildcardCallbacks = this.notificationCallbacks["*"]
+    if (wildcardCallbacks) {
+      wildcardCallbacks.forEach((cb) => (cb(key, value, action)));
+    }
+
+    callbacks = this.notificationCallbacks[key]
+    if (callbacks) {
+      callbacks.forEach((cb) => (cb(key, value, action)));
+    }
   }
 
   /**
@@ -87,10 +120,16 @@ class MemoryStorage {
    */
   setItem(key, value) {
     console.log("SET", key);
+
+    oldValue = this.obj[key]
+    if (oldValue && oldValue != value) {
+      this._sendNotifications(key, value, 2);
+    } else {
+      this._sendNotifications(key, value, 0);
+    }
+
     this.obj[key] = value;
-
     queueSetItem(this.id, this.obj);
-
     return this.obj[key];
   }
 
@@ -112,8 +151,9 @@ class MemoryStorage {
    */
   removeItem(key) {
     console.log("REMOVE", key);
-    delete this.obj[key];
+    this._sendNotifications(key, value, 1)
 
+    delete this.obj[key];
     queueSetItem(this.id, this.obj);
     return true;
   }

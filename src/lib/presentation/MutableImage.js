@@ -42,8 +42,6 @@ export default class MutableImage {
       console.error("Underlying persistance layer has not been initialized.");
     }
 
-    console.log("Setting uri: ", uri)
-
     this.store.setItem(this.key, uri)
     if (this.updateCallback != null) {
       this.updateCallback(uri)

@@ -21,11 +21,18 @@ export default class WeatherApp extends Component<Props> {
   constructor(props) {
     super(props);
 
-    this.store = new LocalStorage("@SmarterWeather")
-    this.state = { zip: null, forecast: null, showOptions: false };
+    this.store = new LocalStorage("@SmarterWeather");
+    this.store.registerNotificationHandler("UnitType", this.onUnitChange.bind(this));
 
-    this.image = new MutableImage(require("./images/flowers.png"))
-    this.image.setPersistanceTarget("MainBackdrop", this.store)
+    this.state = {
+      zip: null,
+      units: null,
+      forecast: null,
+      showOptions: false
+    };
+
+    this.image = new MutableImage(require("./images/flowers.png"));
+    this.image.setPersistanceTarget("MainBackdrop", this.store);
   }
 
   async componentDidMount() {
@@ -41,18 +48,27 @@ export default class WeatherApp extends Component<Props> {
     }
   }
 
+  onUnitChange(key, value, action) {
+    OpenWeatherMap.fetchZipForecast(value, zip).then(forecast => {
+      this.setState({ zip: zip, units: value, forecast: forecast });
+    });
+  }
+
   _getForecastForZip = zip => {
     // Persist zip code
     this.store.setItem("zip", zip)
 
-    OpenWeatherMap.fetchZipForecast(zip).then(forecast => {
-      this.setState({ zip: zip, forecast: forecast });
+    unitType = this.store.getItem("UnitType") || 0
+    OpenWeatherMap.fetchZipForecast(unitType, zip).then(forecast => {
+      this.setState({ zip: zip, units: unitType, forecast: forecast });
     });
   };
 
   _getForecastForCoords = (lat, lon) => {
-    OpenWeatherMap.fetchLatLonForecast(lat, lon).then(forecast => {
-      this.setState({ zip: null, forecast: forecast });
+
+    unitType = this.store.getItem("UnitType") || 0
+    OpenWeatherMap.fetchLatLonForecast(unitType, lat, lon).then(forecast => {
+      this.setState({ zip: null, units: unitType, forecast: forecast });
     });
   };
 
@@ -73,6 +89,7 @@ export default class WeatherApp extends Component<Props> {
           <Forecast
             main={this.state.forecast.main}
             temp={this.state.forecast.temp}
+            units={this.state.units}
           />
         </View>
       );

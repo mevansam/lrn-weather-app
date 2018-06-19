@@ -1,12 +1,23 @@
 const WEATHER_API_KEY = "bbeb34ebf60ad50f7893e7440a1e2b0b";
 const API_STEM = "http://api.openweathermap.org/data/2.5/weather?";
 
-function zipUrl(zip) {
-  return `${API_STEM}q=${zip}&units=imperial&APPID=${WEATHER_API_KEY}`;
+function _getUnitName(units) {
+  switch (units) {
+    case 0:
+      return "imperial";
+    case 1:
+      return "metric";
+    default:
+      return "standard";
+  }
 }
 
-function latLonUrl(lat, lon) {
-  return `${API_STEM}lat=${lat}&lon=${lon}&units=imperial&APPID=${WEATHER_API_KEY}`;
+function zipUrl(units, zip) {
+  return `${API_STEM}q=${zip}&units=${_getUnitName(units)}&APPID=${WEATHER_API_KEY}`;
+}
+
+function latLonUrl(units, lat, lon) {
+  return `${API_STEM}lat=${lat}&lon=${lon}&units=${_getUnitName(units)}&APPID=${WEATHER_API_KEY}`;
 }
 
 function fetchForecast(url) {
@@ -14,6 +25,7 @@ function fetchForecast(url) {
   return fetch(url)
     .then(response => response.json())
     .then(responseJSON => {
+      console.log("responseJSON: ", responseJSON)
       return {
         main: responseJSON.weather[0].main,
         description: responseJSON.weather[0].description,
@@ -25,14 +37,12 @@ function fetchForecast(url) {
     });
 }
 
-function fetchZipForecast(zip) {
-  console.log("zip: " + zip)
-  return fetchForecast(zipUrl(zip));
+function fetchZipForecast(units, zip) {
+  return fetchForecast(zipUrl(units, zip));
 }
 
-function fetchLatLonForecast(lat, lon) {
-  console.log("Lat: " + lat + ", Lon: " + lon)
-  return fetchForecast(latLonUrl(lat, lon));
+function fetchLatLonForecast(units, lat, lon) {
+  return fetchForecast(latLonUrl(units, lat, lon));
 }
 
 export default {
