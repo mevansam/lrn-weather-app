@@ -30,13 +30,24 @@ export default class Options extends Component<Props> {
   }
 
   async componentDidMount() {
+    await this.store.init();
+    this.loadState();
+  }
 
-    await this.store.init()
-
+  loadState() {
     this.setState({
       photoCatalogType: this.store.getItem("PhotoCatalogType") || 0,
       unitType: this.store.getItem("UnitType") || 0
     });
+  }
+
+  async reloadComponent() {
+    // This allows a component refresh event
+    // to be sent from the render() method 
+    // to reload the photo catalog.
+    setTimeout(() => {
+      this.setState({})
+    }, 1);
   }
 
   updatePhotoCatalog(updateFunc) {
@@ -82,12 +93,12 @@ export default class Options extends Component<Props> {
   }
 
   onChoosePhoto(index, uri) {
+    this.store.setItem("PhotoCatalogType", this.state.photoCatalogType)
     this.store.setItem("MainBackdrop", { uri: uri })
   }
 
   _setPhotoCatalogType = (selectedIndex) => {
     this.reloadCatalog = true
-    this.store.setItem("PhotoCatalogType", selectedIndex)
     this.setState({ photoCatalogType: selectedIndex });
   }
 
@@ -101,7 +112,7 @@ export default class Options extends Component<Props> {
 
     showCatalog = !this.reloadCatalog
     if (!showCatalog) {
-      this.setState({})
+      this.reloadComponent()
     }
     this.reloadCatalog = false
 

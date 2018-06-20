@@ -78,6 +78,7 @@ export default class WeatherApp extends Component<Props> {
   };
 
   _showOptions = (visible) => {
+    this.refs.options.loadState();
     this.setState({ showOptions: visible });
   }
 
@@ -100,9 +101,10 @@ export default class WeatherApp extends Component<Props> {
         image={this.image}>
 
         <Options
+          ref={"options"}
           store={this.store}
           isVisible={() => {
-            return this.state.showOptions
+            return this.state.showOptions;
           }}
           onClose={() => {
             this._showOptions(false);
