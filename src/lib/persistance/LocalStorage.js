@@ -119,8 +119,6 @@ class MemoryStorage {
    * @returns {string}
    */
   setItem(key, value) {
-    console.log("SET", key);
-
     oldValue = this.obj[key]
     if (oldValue && oldValue != value) {
       this._sendNotifications(key, value, 2);
@@ -140,7 +138,6 @@ class MemoryStorage {
    * @returns {string}
    */
   getItem(key) {
-    console.log("GET", key);
     return Object.prototype.hasOwnProperty.call(this.obj, key) ? this.obj[key] : undefined;
   }
 
@@ -150,7 +147,6 @@ class MemoryStorage {
    * @param {string} key 
    */
   removeItem(key) {
-    console.log("REMOVE", key);
     this._sendNotifications(key, value, 1)
 
     delete this.obj[key];
