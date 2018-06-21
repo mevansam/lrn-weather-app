@@ -34,6 +34,8 @@ export default class WeatherApp extends Component<Props> {
 
     this.image = new MutableImage(require("./images/flowers.png"));
     this.image.setPersistanceTarget("MainBackdrop", this.store);
+
+    this.coords = null
   }
 
   async componentDidMount() {
@@ -52,14 +54,32 @@ export default class WeatherApp extends Component<Props> {
   }
 
   onUnitChange(key, value, action) {
-    OpenWeatherMap.fetchZipForecast(value, zip).then(forecast => {
-      this.setState({ zip: zip, units: value, forecast: forecast });
-    });
+
+    if (this.coords) {
+
+      const { lat, lon } = this.coords
+
+      OpenWeatherMap.fetchLatLonForecast(value, lat, lon).then(forecast => {
+        this.setState({ zip: null, units: value, forecast: forecast });
+      });
+
+    } else {
+
+      const zip = this.store.getItem("zip");
+
+      if (zip) {
+        OpenWeatherMap.fetchZipForecast(value, zip).then(forecast => {
+          this.setState({ zip: zip, units: value, forecast: forecast });
+        });
+      }
+    }
   }
 
   _getForecastForZip = zip => {
     // Persist zip code
     this.store.setItem("zip", zip)
+
+    this.coords = null;
 
     unitType = this.store.getItem("UnitType") || 0
     OpenWeatherMap.fetchZipForecast(unitType, zip).then(forecast => {
@@ -68,6 +88,8 @@ export default class WeatherApp extends Component<Props> {
   };
 
   _getForecastForCoords = (lat, lon) => {
+
+    this.coords = { lat: lat, lon: lon };
 
     unitType = this.store.getItem("UnitType") || 0
     OpenWeatherMap.fetchLatLonForecast(unitType, lat, lon).then(forecast => {

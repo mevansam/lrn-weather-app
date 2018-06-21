@@ -60,7 +60,7 @@ export default class Options extends Component<Props> {
     if (this.state.photoCatalogType == 0) {
 
       CameraRoll.getPhotos({
-        first: 100
+        first: 20
       }).then(data => {
 
         var photos = data.edges.map(edge => {
