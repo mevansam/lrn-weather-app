@@ -47,4 +47,6 @@ The following keys were also added to show a descriptive messages when allowing 
   .
 ```
 
-To modify the application icons and the splash screen this [blog on Medium.com](https://medium.com/@scottianstewart/react-native-add-app-icons-and-launch-screens-onto-ios-and-android-apps-3bfbc20b7d4c) was followed.
+To modify the application icons and the splash screen the following blogs were referenced:
+* https://medium.com/@scottianstewart/react-native-add-app-icons-and-launch-screens-onto-ios-and-android-apps-3bfbc20b7d4c)
+* https://medium.com/handlebar-labs/how-to-add-a-splash-screen-to-a-react-native-app-ios-and-android-30a3cec835ae
