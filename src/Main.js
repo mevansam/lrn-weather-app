@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View, TextInput } from "react-native";
 import { Icon } from 'react-native-elements';
+import SplashScreen from 'react-native-splash-screen'
 
 import LocalStorage from "./lib/persistance/LocalStorage"
 import MutableImage from "./lib/presentation/MutableImage"
@@ -46,6 +47,8 @@ export default class WeatherApp extends Component<Props> {
       // Force update of view
       this.setState({})
     }
+
+    SplashScreen.hide();
   }
 
   onUnitChange(key, value, action) {
