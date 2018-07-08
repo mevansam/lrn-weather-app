@@ -38,13 +38,12 @@ export default class MutableImage {
    * @param {object} uri 
    */
   setUri(uri) {
-    if (this.store == null) {
-      console.error("Underlying persistance layer has not been initialized.");
-    }
+    if (this.store != null) {
 
-    this.store.setItem(this.key, uri)
-    if (this.updateCallback != null) {
-      this.updateCallback(uri)
+      this.store.setItem(this.key, uri)
+      if (this.updateCallback != null) {
+        this.updateCallback(uri)
+      }
     }
   }
 
